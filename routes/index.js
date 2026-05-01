@@ -1,25 +1,33 @@
 const express = require('express');
-const router  = express.Router();
+const router = express.Router();
+const authMiddleware = require('../middleware/auth');
+const {
+    auth,
+    statusAntrean,
+    ambilAntrean,
+    checkinAntrean,
+    batalAntrean,
+    sisaAntrean,
+    jadwalOperasiRS,
+    jadwalOperasiPasien,
+    pasienBaru,
+    initalize
+} = require('../controllers');
 
-const { authBasic, authToken }   = require('../middleware/auth');
-const { createToken }            = require('../controllers/authController');
-const { statusAntrean }          = require('../controllers/statusAntreanController');
-const { ambilAntrean }           = require('../controllers/ambilAntreanController');
-const { checkinAntrean, batalAntrean, sisaAntrean } = require('../controllers/antreanController');
-const { jadwalOperasiRS, jadwalOperasiPasien }      = require('../controllers/operasiController');
-const { pasienBaru }             = require('../controllers/pasienBaruController');
+// Auth
+router.get('/auth', auth);
 
-// GET - auth
-router.get('/auth', authBasic, createToken);
+// Public routes
+router.get('/', initalize);
 
-// POST - semua endpoint pakai authToken
-router.post('/statusantrean',      authToken, statusAntrean);
-router.post('/ambilantrean',       authToken, ambilAntrean);
-router.post('/checkinantrean',     authToken, checkinAntrean);
-router.post('/batalantrean',       authToken, batalAntrean);
-router.post('/sisaantrean',        authToken, sisaAntrean);
-router.post('/jadwaloperasirs',    authToken, jadwalOperasiRS);
-router.post('/jadwaloperasipasien',authToken, jadwalOperasiPasien);
-router.post('/pasienbaru',         authToken, pasienBaru);
+// Protected routes
+router.post('/statusantrean', authMiddleware, statusAntrean);
+router.post('/ambilantrean', authMiddleware, ambilAntrean);
+router.post('/checkinantrean', authMiddleware, checkinAntrean);
+router.post('/batalantrean', authMiddleware, batalAntrean);
+router.post('/sisaantrean', authMiddleware, sisaAntrean);
+// router.post('/jadwaloperasirs', authMiddleware, jadwalOperasiRS);
+// router.post('/jadwaloperasipasien', authMiddleware, jadwalOperasiPasien);
+// router.post('/pasienbaru', authMiddleware, pasienBaru);
 
 module.exports = router;

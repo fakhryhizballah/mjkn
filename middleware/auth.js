@@ -1,30 +1,29 @@
-const sequelize = require('../config/database');
-const { QueryTypes } = require('sequelize');
+const jwt = require('jsonwebtoken');
 
-const fail = (res, msg = 'Unauthorized', code = 201) =>
-  res.status(code).json({ metadata: { message: msg, code } });
+const authMiddleware = (req, res, next) => {
+    const token = req.headers['x-token'];
+    const username = req.headers['x-username'];
 
-// GET: validasi x-username + x-password
-const authBasic = (req, res, next) => {
-  const { 'x-username': user, 'x-password': pass } = req.headers;
-  if (!user || !pass) return fail(res, 'Username dan Password wajib diisi..!!');
-  req.authUser = user;
-  req.authPass = pass;
-  next();
+    if (!token || !username) {
+        return res.status(401).json({
+            metadata: { message: 'Token dan username diperlukan', code: 401 }
+        });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.username !== username) {
+            return res.status(401).json({
+                metadata: { message: 'Token tidak valid', code: 201 }
+            });
+        }
+        console.log(decoded);
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            metadata: { message: 'Token tidak valid', code: 201 }
+        });
+    }
 };
 
-// POST: validasi x-username + x-token
-const authToken = async (req, res, next) => {
-  const { 'x-username': user, 'x-token': token } = req.headers;
-  if (!user || !token) return fail(res, 'Username dan Token wajib diisi..!!');
-  if (user !== process.env.API_USERNAME) return fail(res, 'Username salah..!!');
-
-  const [row] = await sequelize.query(
-    `SELECT token FROM token_api WHERE username = :user AND token = :token AND expired > NOW() LIMIT 1`,
-    { replacements: { user, token }, type: QueryTypes.SELECT }
-  );
-  if (!row) return fail(res, 'Token salah/expired..!!');
-  next();
-};
-
-module.exports = { authBasic, authToken };
+module.exports = authMiddleware;
