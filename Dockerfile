@@ -1,4 +1,3 @@
-  GNU nano 7.2                                                                                        Dockerfile                                                                                                  
 FROM node:20-alpine
 
 # Instal PM2 secara global
