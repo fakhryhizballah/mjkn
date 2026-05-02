@@ -1220,7 +1220,119 @@ const jadwalOperasiRS = async (req, res) => {
 };
 
 const jadwalOperasiPasien = async (req, res) => {
-// Implementasi jadwal operasi pasien
+    try {
+        const decode = req.body;
+
+        // Helper untuk mempermudah response
+        const sendResponse = (message, code = 201) => {
+            return res.status(code).json({ metadata: { message, code } });
+        };
+
+        // ==========================================
+        // 1. BLOK VALIDASI INPUT (EARLY RETURNS)
+        // ==========================================
+
+        if (!decode.nopeserta) return sendResponse('Nomor Peserta tidak boleh kosong');
+        if (decode.nopeserta.length !== 13) return sendResponse('Nomor Peserta harus 13 digit');
+        if (!/^[0-9]{13}$/.test(decode.nopeserta)) return sendResponse('Format Nomor Peserta tidak sesuai');
+
+        // ==========================================
+        // 2. QUERY DATABASE MENGGUNAKAN SEQUELIZE
+        // ==========================================
+
+        // Menggantikan logika INNER JOIN yang panjang dari PHP
+        const queryOperasiPasien = await booking_operasi.findAll({
+            attributes: ['no_rawat', 'tanggal', 'status', 'jam_mulai'],
+            include: [
+                {
+                    model: reg_periksa,
+                    as: 'reg_periksa',
+                    required: true,
+                    include: [
+                        {
+                            model: pasien,
+                            as: 'pasien',
+                            required: true,
+                            where: { no_peserta: decode.nopeserta },
+                            attributes: ['no_peserta'] // Hanya ambil yang diperlukan
+                        },
+                        {
+                            model: maping_poli_bpjs,
+                            as: 'maping_poli_bpjs',
+                            required: true,
+                            attributes: ['kd_poli_bpjs', 'nm_poli_bpjs']
+                        }
+                    ]
+                },
+                {
+                    model: paket_operasi,
+                    required: true,
+                    attributes: ['nm_perawatan']
+                }
+            ],
+            order: [
+                ['tanggal', 'ASC'],
+                ['jam_mulai', 'ASC']
+            ]
+        });
+
+        // Jika data pasien tidak ditemukan
+        if (!queryOperasiPasien || queryOperasiPasien.length === 0) {
+            return sendResponse('Maaf anda tidak memiliki jadwal operasi');
+        }
+
+        // ==========================================
+        // 3. MAPPING DATA HASIL QUERY KE BENTUK ARRAY
+        // ==========================================
+
+        const data_array = queryOperasiPasien.map(item => {
+            // Evaluasi status operasi (0 = Menunggu, 1 = Selain itu)
+            const statusTerlaksana = item.status === 'Menunggu' ? 0 : 1;
+
+            return {
+                kodebooking: item.no_rawat,
+                tanggaloperasi: item.tanggal,
+                jenistindakan: item.paket_operasi?.nm_perawatan || '-',
+                kodepoli: item.reg_periksa?.maping_poli_bpj?.kd_poli_bpjs || '-',
+                namapoli: item.reg_periksa?.maping_poli_bpj?.nm_poli_bpjs || '-',
+                terlaksana: statusTerlaksana,
+                nopeserta: item.reg_periksa?.pasien?.no_peserta || '-'
+                // Catatan: Pada endpoint ini, sesuai kode PHP asli, 'lastupdate' tidak disertakan.
+            };
+        });
+
+        // ==========================================
+        // 4. MENGIRIM RESPONSE BERHASIL
+        // ==========================================
+
+        return res.status(200).json({
+            response: {
+                list: data_array
+            },
+            metadata: {
+                message: 'Ok',
+                code: 200
+            }
+        });
+
+    } catch (error) {
+        console.error("Error Jadwal Operasi Pasien: ", error);
+        return res.status(500).json({
+            metadata: {
+                message: "Terjadi kesalahan internal server",
+                code: 500
+            }
+        });
+    }
+};
+const pasienBaru = async (req, res) => {
+    // Implementasi pasien baru
+    return res.status(500).json({
+        metadata: {
+            message: "Maaf, fitur Pasien Baru belum tersedia.",
+            code: 500
+        }
+    });
 };
 
 module.exports = {
@@ -1231,6 +1343,7 @@ module.exports = {
     sisaAntrean,
     jadwalOperasiRS,
     jadwalOperasiPasien,
+    pasienBaru,
     initalize,
     auth
 };
