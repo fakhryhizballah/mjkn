@@ -26,7 +26,7 @@ router.post('/ambilantrean', authMiddleware, ambilAntrean);
 router.post('/checkinantrean', authMiddleware, checkinAntrean);
 router.post('/batalantrean', authMiddleware, batalAntrean);
 router.post('/sisaantrean', authMiddleware, sisaAntrean);
-// router.post('/jadwaloperasirs', authMiddleware, jadwalOperasiRS);
+router.post('/jadwaloperasirs', authMiddleware, jadwalOperasiRS);
 // router.post('/jadwaloperasipasien', authMiddleware, jadwalOperasiPasien);
 // router.post('/pasienbaru', authMiddleware, pasienBaru);
 

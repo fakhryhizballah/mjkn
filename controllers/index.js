@@ -10,6 +10,8 @@ const {
     pasien,
     referensi_mobilejkn_bpjs,
     referensi_mobilejkn_bpjs_batal,
+    booking_operasi,
+    paket_operasi,
     setting
 } = require("../models");
 const { isValidDate } = require("../helpers");
@@ -1092,7 +1094,129 @@ const sisaAntrean = async (req, res) => {
 };
 
 const jadwalOperasiRS = async (req, res) => {
-// Implementasi jadwal operasi RS
+    try {
+        const decode = req.body;
+
+        // Helper untuk standarisasi format response error
+        const sendResponse = (message, code = 201) => {
+            return res.status(code).json({ metadata: { message, code } });
+        };
+
+        // ==========================================
+        // 1. BLOK VALIDASI INPUT (EARLY RETURNS)
+        // ==========================================
+
+        const regexTanggal = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        // Mendapatkan tanggal hari ini dengan format YYYY-MM-DD
+        const hariIniObj = new Date();
+        const today = `${hariIniObj.getFullYear()}-${String(hariIniObj.getMonth() + 1).padStart(2, '0')}-${String(hariIniObj.getDate()).padStart(2, '0')}`;
+
+        // Validasi Tanggal Awal
+        if (!decode.tanggalawal) return sendResponse('Tanggal Awal tidak boleh kosong');
+        if (!regexTanggal.test(decode.tanggalawal)) return sendResponse('Format Tanggal Awal tidak sesuai, format yang benar adalah yyyy-mm-dd');
+        if (today > decode.tanggalawal) return sendResponse('Tanggal Awal tidak berlaku mundur');
+
+        // Validasi Tanggal Akhir
+        if (!decode.tanggalakhir) return sendResponse('Tanggal Akhir tidak boleh kosong');
+        if (!regexTanggal.test(decode.tanggalakhir)) return sendResponse('Format Tanggal Akhir tidak sesuai, format yang benar adalah yyyy-mm-dd');
+        if (today > decode.tanggalakhir) return sendResponse('Tanggal Akhir tidak berlaku mundur');
+
+        // Validasi Logika Rentang Waktu
+        if (decode.tanggalawal > decode.tanggalakhir) {
+            return sendResponse('Format tanggal awal harus lebih kecil dari tanggal akhir');
+        }
+
+        // ==========================================
+        // 2. Kueri Database dengan Sequelize (Include = JOIN)
+        // ==========================================
+
+        const jadwalOperasi = await booking_operasi.findAll({
+            attributes: ['no_rawat', 'tanggal', 'status', 'jam_mulai'],
+            where: {
+                tanggal: {
+                    [Op.between]: [decode.tanggalawal, decode.tanggalakhir]
+                }
+            },
+            include: [
+                {
+                    model: reg_periksa,
+                    required: true,
+                    attributes: ['no_rkm_medis', 'kd_poli'],
+                    include: [
+                        {
+                            model: pasien,
+                            as: 'pasien',
+                            required: true,
+                            attributes: ['no_peserta']
+                        },
+                        {
+                            model: maping_poli_bpjs,
+                            as: 'maping_poli_bpjs',
+                            required: true,
+                            attributes: ['kd_poli_bpjs', 'nm_poli_bpjs'],
+                            // Menyesuaikan ON maping_poli_bpjs.kd_poli_rs = reg_periksa.kd_poli
+                            // Pastikan relasi ini diset menggunakan targetKey/sourceKey yang tepat di model
+                        }
+                    ]
+                },
+                {
+                    model: paket_operasi,
+                    required: true,
+                    attributes: ['nm_perawatan']
+                }
+            ],
+            order: [
+                ['tanggal', 'ASC'],
+                ['jam_mulai', 'ASC']
+            ]
+        });
+
+        // ==========================================
+        // 3. FORMATTING DATA & RESPONSE
+        // ==========================================
+
+        if (!jadwalOperasi || jadwalOperasi.length === 0) {
+            return sendResponse('Maaf tidak ada Jadwal Operasi pada tanggal tersebut');
+        }
+
+        const currentTimeMs = Date.now(); // Setara dengan strtotime(date('Y-m-d H:i:s')) * 1000
+
+        const data_array = jadwalOperasi.map(item => {
+            // Mapping status: Jika 'Menunggu' = 0, selain itu = 1
+            const statusTerlaksana = item.status === 'Menunggu' ? 0 : 1;
+
+            return {
+                kodebooking: item.no_rawat,
+                tanggaloperasi: item.tanggal,
+                jenistindakan: item.paket_operasi?.nm_perawatan || '-',
+                kodepoli: item.reg_periksa?.maping_poli_bpj?.kd_poli_bpjs || '-',
+                namapoli: item.reg_periksa?.maping_poli_bpj?.nm_poli_bpjs || '-',
+                terlaksana: statusTerlaksana,
+                nopeserta: item.reg_periksa?.pasien?.no_peserta || '-',
+                lastupdate: currentTimeMs
+            };
+        });
+
+        return res.status(200).json({
+            response: {
+                list: data_array
+            },
+            metadata: {
+                message: 'Ok',
+                code: 200
+            }
+        });
+
+    } catch (error) {
+        console.error("Jadwal Operasi RS Error:", error);
+        return res.status(500).json({
+            metadata: {
+                message: "Terjadi kesalahan internal server.",
+                code: 500
+            }
+        });
+    }
 };
 
 const jadwalOperasiPasien = async (req, res) => {
