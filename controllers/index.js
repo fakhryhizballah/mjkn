@@ -460,8 +460,8 @@ const ambilAntrean = async (req, res) => {
 
     // Validasi No HP (Mencegah karakter ' atau \ masuk)
     if (!decode.nohp) return sendError('No.HP tidak boleh kosong');
-    if (decode.nohp.length >= 10) return sendError('No.HP harus 13 digit');
-    // if (/['\\]/.test(decode.nohp)) return sendError('Format No.HP salah');
+        // if (decode.nohp.length >= 10) return sendError('No.HP harus 13 digit');
+        if (/['\\]/.test(decode.nohp)) return sendError('Format No.HP salah');
 
     // Validasi Kode Poli
     if (!decode.kodepoli) return sendError('Kode Poli tidak boleh kosong');
