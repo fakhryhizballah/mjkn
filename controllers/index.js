@@ -557,8 +557,8 @@ const ambilAntrean = async (req, res) => {
         if (sudahDaftar > 0) return sendError('Nomor Antrean hanya dapat diambil 1 kali pada Tanggal, Dokter dan Poli yang sama');
 
         // Pengecekan interval waktu (pendaftaran sudah tutup/belum)
-        // const d1 = new Date(decode.tanggalperiksa);
-        // const d2 = new Date(hariIni);
+        const d1 = new Date(decode.tanggalperiksa);
+        const d2 = new Date(hariIni);
         // const interval = (d1 - d2) / (1000 * 60 * 60 * 24);
         // if (interval <= 0) return sendError('Pendaftaran ke Poli ini sudah tutup');
 
@@ -721,10 +721,10 @@ const ambilAntrean = async (req, res) => {
              ).catch(e => console.log('Gagal update status gagal', e));
         }
 
-        return res.status(401).json({
+        return res.status(201).json({
             metadata: {
                 message: "Maaf terjadi kesalahan, hubungi Admnistrator..",
-                code: 401
+                code: 201
             }
         });
     }
@@ -832,10 +832,10 @@ const checkinAntrean = async (req, res) => {
     } catch (error) {
         console.error("Checkin Error:", error);
         // Error tidak terduga pada server
-        return res.status(401).json({
+        return res.status(201).json({
             metadata: {
                 message: "Maaf terjadi kesalahan, hubungi Admnistrator..",
-                code: 401
+                code: 201
             }
         });
     }
