@@ -688,7 +688,7 @@ const ambilAntrean = async (req, res) => {
         // 4. PENGIRIMAN RESPONSE SUKSES
         // ==========================================
 
-        return res.status(200).json({
+        return res.status(201).json({
             response: {
                 nomorantrean: `${transactionResult.kdpoli}-${transactionResult.noReg}`,
                 angkaantrean: parseInt(transactionResult.noReg),
