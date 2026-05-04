@@ -557,10 +557,10 @@ const ambilAntrean = async (req, res) => {
         if (sudahDaftar > 0) return sendError('Nomor Antrean hanya dapat diambil 1 kali pada Tanggal, Dokter dan Poli yang sama');
 
         // Pengecekan interval waktu (pendaftaran sudah tutup/belum)
-        const d1 = new Date(decode.tanggalperiksa);
-        const d2 = new Date(hariIni);
-        const interval = (d1 - d2) / (1000 * 60 * 60 * 24);
-        if (interval <= 0) return sendError('Pendaftaran ke Poli ini sudah tutup');
+        // const d1 = new Date(decode.tanggalperiksa);
+        // const d2 = new Date(hariIni);
+        // const interval = (d1 - d2) / (1000 * 60 * 60 * 24);
+        // if (interval <= 0) return sendError('Pendaftaran ke Poli ini sudah tutup');
 
         // Pengecekan Kuota
         const sisakuota = await reg_periksa.count({
