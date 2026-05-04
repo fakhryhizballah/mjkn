@@ -592,7 +592,7 @@ const ambilAntrean = async (req, res) => {
         });
         const statuspoli = cekLama > 0 ? 'Lama' : 'Baru';
 
-        const waktutunggu = 5; // Asumsi variabel waktu tunggu (sesuaikan dengan logic sistem Anda)
+        const waktutunggu = 2; // Asumsi variabel waktu tunggu (sesuaikan dengan logic sistem Anda)
         const dilayani = noReg * waktutunggu;
         const statusdaftar = datapeserta.tgl_daftar === decode.tanggalperiksa ? "1" : "0";
         const stts_daftar_string = statusdaftar === "1" ? "Baru" : "Lama";
@@ -625,7 +625,7 @@ const ambilAntrean = async (req, res) => {
         const transactionResult = await sequelize.transaction(async (t) => {
             
             // Insert Referensi Mobile JKN
-            const estimasiWaktu = new Date(`${decode.tanggalperiksa} ${dataJadwal.jam_mulai}`).getTime() + (dilayani * 10000);
+            const estimasiWaktu = new Date(`${decode.tanggalperiksa} ${dataJadwal.jam_mulai}`).getTime() + (dilayani * 60 * 1000);
             const kuotaSisaUpdate = dataJadwal.kuota - sisakuota - 1;
 
             await referensi_mobilejkn_bpjs.create({
