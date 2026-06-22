@@ -721,7 +721,7 @@ const ambilAntrean = async (req, res) => {
         console.error(error);
         let idLog = genLogId();
         dataLog.error(idLog, error);
-        dataLog.debug(idLog, req.body.nobooking);
+        dataLog.debug(idLog, req.body);
         // Block Error Catch setara dengan bagian update status="Gagal" di PHP
         if (req.body.nobooking) { // Hanya ilustrasi, di Node.js kita butuh passing nobooking scope
              await referensi_mobilejkn_bpjs.update(
