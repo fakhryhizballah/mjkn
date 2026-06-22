@@ -17,6 +17,7 @@ const {
 const { isValidDate } = require("../helpers");
 const jwt = require('jsonwebtoken');
 const  moment = require('moment');
+const { dataLog, genLogId } = require('../helpers/loggers');
 
 const WAKTU_TUNGGU = 10;
 
@@ -273,9 +274,11 @@ Cara Menggunakan Web Service Antrean BPJS Mobile JKN FKTL :
 
     } catch (error) {
         console.error("Error pada fungsi tampil:", error);
-        return res.status(500).json({
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
+        return res.status(201).json({
             metadata: {
-                message: "Internal Server Error",
+                message: "Internal Server Error #" + idLog,
                 code: 500
             }
         });
@@ -285,6 +288,8 @@ const auth = async (req, res) => {
     const username = req.headers['x-username'];
     const password = req.headers['x-password'];
     if (!username || !password) {
+
+        dataLog.info(idLog, 'x-username dan x-password diperlukan');
         return res.status(201).json({
             'metadata': {
                 'message': 'x-username dan x-password diperlukan',
@@ -429,7 +434,9 @@ const statusAntrean = async (req, res) => {
 
     } catch (error) {
         console.error('[ERROR /jadwalkan]', error);
-         return  res.status(500).json({
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
+        return res.status(201).json({
             metadata: { message: 'Server error', code: 500 }
         });
     }
@@ -712,7 +719,9 @@ const ambilAntrean = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
+        dataLog.debug(idLog, req.body.nobooking);
         // Block Error Catch setara dengan bagian update status="Gagal" di PHP
         if (req.body.nobooking) { // Hanya ilustrasi, di Node.js kita butuh passing nobooking scope
              await referensi_mobilejkn_bpjs.update(
@@ -723,7 +732,7 @@ const ambilAntrean = async (req, res) => {
 
         return res.status(201).json({
             metadata: {
-                message: "Maaf terjadi kesalahan, hubungi Admnistrator..",
+                message: "Maaf terjadi kesalahan, hubungi Admnistrator | ID Error #: " + idLog,
                 code: 201
             }
         });
@@ -832,9 +841,11 @@ const checkinAntrean = async (req, res) => {
     } catch (error) {
         console.error("Checkin Error:", error);
         // Error tidak terduga pada server
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
         return res.status(201).json({
             metadata: {
-                message: "Maaf terjadi kesalahan, hubungi Admnistrator..",
+                message: "Maaf terjadi kesalahan, hubungi Admnistrator | ID Log: " + idLog,
                 code: 201
             }
         });
@@ -958,9 +969,11 @@ const batalAntrean = async (req, res) => {
     } catch (error) {
         console.error("Batal Antrean Error:", error);
         // Menangkap error dari DB Transaction atau error sistem lainnya
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
         return res.status(201).json({
             metadata: {
-                message: "Maaf Terjadi Kesalahan, Hubungi Admnistrator..",
+                message: "Maaf Terjadi Kesalahan, Hubungi Admnistrator |#" + idLog,
                 code: 201
             }
         });
@@ -1083,10 +1096,12 @@ const sisaAntrean = async (req, res) => {
         });
 
     } catch (error) {
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
         console.error("Sisa Antrean Error:", error);
         return res.status(201).json({
             metadata: {
-                message: "Antrean Tidak Ditemukan ! / Terjadi Kesalahan",
+                message: "Antrean Tidak Ditemukan ! / Terjadi Kesalahan |#" + idLog,
                 code: 201
             }
         });
@@ -1210,9 +1225,11 @@ const jadwalOperasiRS = async (req, res) => {
 
     } catch (error) {
         console.error("Jadwal Operasi RS Error:", error);
-        return res.status(500).json({
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
+        return res.status(201).json({
             metadata: {
-                message: "Terjadi kesalahan internal server.",
+                message: "Terjadi kesalahan internal server.| #" + idLog,
                 code: 500
             }
         });
@@ -1317,9 +1334,11 @@ const jadwalOperasiPasien = async (req, res) => {
 
     } catch (error) {
         console.error("Error Jadwal Operasi Pasien: ", error);
-        return res.status(500).json({
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
+        return res.status(201).json({
             metadata: {
-                message: "Terjadi kesalahan internal server",
+                message: "Terjadi kesalahan internal server | #" + idLog,
                 code: 500
             }
         });
@@ -1327,9 +1346,11 @@ const jadwalOperasiPasien = async (req, res) => {
 };
 const pasienBaru = async (req, res) => {
     // Implementasi pasien baru
-    return res.status(500).json({
+    let idLog = genLogId();
+    dataLog.info(idLog, error);
+    return res.status(201).json({
         metadata: {
-            message: "Maaf, fitur Pasien Baru belum tersedia.",
+            message: "Maaf, fitur Pasien Baru belum tersedia. | #" + idLog,
             code: 500
         }
     });
