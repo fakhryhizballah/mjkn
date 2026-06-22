@@ -597,11 +597,7 @@ const ambilAntrean = async (req, res) => {
             let parts = findlastreg.no_rawat.split('/');
             maxRawat = parseInt(parts[parts.length - 1], 10) + 1;
         }
-
-
         const no_rawat = `${decode.tanggalperiksa.replace(/-/g, "/")}/${String(maxRawat).padStart(6, '0')}`;
-        dataLog.info(null, { findlastreg, maxRawat, no_rawat });
-
         // Generate nobooking
         const maxBooking = await referensi_mobilejkn_bpjs.count({ where: { tanggalperiksa: d1 } })+1;
         const nobooking = `${decode.tanggalperiksa.replace(/-/g, "")}${String(maxBooking).padStart(6, '0')}`;
