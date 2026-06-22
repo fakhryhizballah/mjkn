@@ -1,6 +1,6 @@
 {
   "name": "mjkn",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Refaktor dari `index.php` ke Express.js + Sequelize (MariaDB).",
   "main": "index.js",
   "keywords": [],
