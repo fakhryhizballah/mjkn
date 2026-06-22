@@ -586,7 +586,17 @@ const ambilAntrean = async (req, res) => {
         const noReg = (sisakuota + 1).toString().padStart(3, '0');
         
         // Generate no_rawat
-        const maxRawat = await reg_periksa.count({ where: { tgl_registrasi: decode.tanggalperiksa } }) + 1;
+        // const maxRawat = await reg_periksa.count({ where: { tgl_registrasi: decode.tanggalperiksa } }) + 1;
+        let findlastreg = await reg_periksa.findOne({
+            where: { tgl_registrasi: decode.tanggalperiksa },
+            order: [['no_rawat', 'DESC']]
+        })
+        let maxRawat = 0;
+        if (findlastreg) {
+            let parts = findlastreg.no_rawat.split('/');
+            maxRawat = parseInt(parts[parts.length - 1], 10);
+        }
+
         const no_rawat = `${decode.tanggalperiksa.replace(/-/g, "/")}/${String(maxRawat).padStart(6, '0')}`;
 
         // Generate nobooking
