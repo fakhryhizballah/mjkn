@@ -18,6 +18,7 @@ const { isValidDate } = require("../helpers");
 const jwt = require('jsonwebtoken');
 const  moment = require('moment');
 const { dataLog, genLogId } = require('../helpers/loggers');
+const { patch } = require("../routes");
 
 const WAKTU_TUNGGU = 10;
 
@@ -451,6 +452,13 @@ const ambilAntrean = async (req, res) => {
 
     // Fungsi helper untuk mereturn error secara seragam
     const sendError = (message, code = 201) => {
+        let idLog = genLogId();
+        let data = {
+            path: '/ambilantrean',
+            status: message,
+            payload: req.body
+        }
+        dataLog.debug(idLog, data);
         return res.status(code).json({ metadata: { message, code } });
     };
     try{
