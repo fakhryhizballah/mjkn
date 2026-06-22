@@ -595,7 +595,7 @@ const ambilAntrean = async (req, res) => {
         let maxRawat = 0;
         if (findlastreg) {
             let parts = findlastreg.no_rawat.split('/');
-            maxRawat = parseInt(parts[parts.length - 1], 10);
+            maxRawat = parseInt(parts[parts.length - 1], 10) + 1;
         }
 
 
