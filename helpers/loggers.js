@@ -28,7 +28,8 @@ class dataLog {
             app: this.APP_NAME,
             logid: finalLogId,
             level: level,
-            error: errorMsg instanceof Error ? errorMsg.message : errorMsg
+            error: errorMsg instanceof Error ? errorMsg.message : errorMsg,
+            full: errorMsg
         };
 
         try {
