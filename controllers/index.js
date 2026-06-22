@@ -329,7 +329,6 @@ const auth = async (req, res) => {
 const findValidJadwal = async (kodePoli, kodeDokter, tanggalPeriksa) => {
     // Contoh: cari jadwal yang sesuai dengan hari & jam kerja
     const hariKerja = moment(tanggalPeriksa).locale('id').format('dddd');
-    console.log(kodePoli);
 
     // Asumsi: hari_kerja di DB disimpan sebagai nama hari (case-insensitive)
     const where = {
@@ -359,7 +358,6 @@ const statusAntrean = async (req, res) => {
             });
         }
 
-        console.log(poli);
         // 2️⃣ Cari dokter
         const dokter = await maping_dokter_dpjpvclaim.findOne({ where: { kd_dokter_bpjs: kodedokter } });
         if (!dokter) {
@@ -367,7 +365,6 @@ const statusAntrean = async (req, res) => {
                 metadata: { message: 'Dokter tidak ditemukan', code: 201 }
             });
         }
-        console.log(dokter);
 
         // 3️⃣ Cari jadwal (sesuai kodepoli, kodedokter, dan hari kerja)
         const jadwaldrp = await findValidJadwal(poli.kd_poli_rs, dokter.kd_dokter, tanggalperiksa);
@@ -402,7 +399,7 @@ const statusAntrean = async (req, res) => {
             
         })
         const sisaAntrean = jadwaldrp.kuota - totalAntrean;
-        console.log(sisaAntrean);
+        console.log('sisaAntrean', sisaAntrean);
 
         if (sisaAntrean <= 0) {
             return res.status(201).json({
@@ -599,7 +596,6 @@ const ambilAntrean = async (req, res) => {
             where: { tgl_registrasi: decode.tanggalperiksa },
             order: [['no_rawat', 'DESC']]
         })
-        console.log(findlastreg);
         let maxRawat = 0;
         if (findlastreg) {
             let parts = findlastreg.no_rawat.split('/');
