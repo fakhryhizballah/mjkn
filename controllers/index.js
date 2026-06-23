@@ -745,7 +745,7 @@ const ambilAntrean = async (req, res) => {
 
         return res.status(201).json({
             metadata: {
-                message: "Maaf terjadi kesalahan, hubungi Admnistrator | ID Error #: " + idLog,
+                message: "Maaf terjadi kesalahan, hubungi Admnistrator | ID Error #" + idLog,
                 code: 201
             }
         });
@@ -847,7 +847,9 @@ const checkinAntrean = async (req, res) => {
                     metadata: { message: 'Ok', code: 200 }
                 });
             } else {
-                return sendResponse('Maaf terjadi kesalahan, hubungi Admnistrator..', 401);
+                let idLog = genLogId();
+                dataLog.error(idLog, error);
+                return sendResponse("Maaf terjadi kesalahan, hubungi Admnistrator| ID Error #" + idLog, 401);
             }
         }
 
@@ -858,7 +860,7 @@ const checkinAntrean = async (req, res) => {
         dataLog.error(idLog, error);
         return res.status(201).json({
             metadata: {
-                message: "Maaf terjadi kesalahan, hubungi Admnistrator | ID Log: " + idLog,
+                message: "Maaf terjadi kesalahan, hubungi Admnistrator | ID Error #" + idLog,
                 code: 201
             }
         });
@@ -986,7 +988,7 @@ const batalAntrean = async (req, res) => {
         dataLog.error(idLog, error);
         return res.status(201).json({
             metadata: {
-                message: "Maaf Terjadi Kesalahan, Hubungi Admnistrator |#" + idLog,
+                message: "Maaf Terjadi Kesalahan, Hubungi Admnistrator |ID Error #" + idLog,
                 code: 201
             }
         });
