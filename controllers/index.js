@@ -629,7 +629,7 @@ const ambilAntrean = async (req, res) => {
         let tglLahir = new Date(datapeserta.tgl_lahir);
         let tglSekarang = new Date();
             umur = (tglSekarang.getFullYear() - tglLahir.getFullYear()) * 12 + (tglSekarang.getMonth() - tglLahir.getMonth());
-            sttsumur = "Bln";
+            sttsumur = "Bl";
         }
 
         // Mapping Jenis Kunjungan
