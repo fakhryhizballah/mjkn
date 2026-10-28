@@ -304,31 +304,43 @@ const auth = async (req, res) => {
         });
     }
     const nip = req.headers['x-nip'];
-    let user = await sequelize.query("select kd_pj,aes_decrypt(usere,'nur') as user,aes_decrypt(passworde,'windi') as pass FROM password_asuransi", {
-        type: QueryTypes.SELECT
-    });
-    let data = {
-        user: user[0].user.toString(),
-        password: user[0].pass.toString()
-    }
-    if (data.user == username && data.password == password) {
-        let token = jwt.sign({ username: username }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1h' });
-        return res.status(200).json({
+    try {
+        let user = await sequelize.query("select kd_pj,aes_decrypt(usere,'nur') as user,aes_decrypt(passworde,'windi') as pass FROM password_asuransi", {
+            type: QueryTypes.SELECT
+        });
+        let data = {
+            user: user[0].user.toString(),
+            password: user[0].pass.toString()
+        }
+        if (data.user == username && data.password == password) {
+            let token = jwt.sign({ username: username }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1h' });
+            return res.status(200).json({
+                'metadata': {
+                    'message': 'Ok',
+                    'code': 200
+                },
+                'response': {
+                    'token': token
+                }
+            });
+        }
+        return res.status(201).json({
             'metadata': {
-                'message': 'Ok',
-                'code': 200
-            },
-            'response': {
-                'token': token
+                'message': 'Username atau password salah',
+                'code': 201
+            }
+        });
+    } catch (error) {
+        let idLog = genLogId();
+        dataLog.error(idLog, error);
+        return res.status(201).json({
+            metadata: {
+                message: "Internal Server Error #" + idLog,
+                code: 500
             }
         });
     }
-    return res.status(201).json({
-        'metadata': {
-            'message': 'Username atau password salah',
-            'code': 201
-        }
-    });
+
 }
 // 💡 Helper: Cari jadwal yang valid berdasarkan kriterianya
 const findValidJadwal = async (kodePoli, kodeDokter, tanggalPeriksa) => {
