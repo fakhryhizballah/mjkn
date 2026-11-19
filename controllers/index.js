@@ -738,7 +738,7 @@ const ambilAntrean = async (req, res) => {
                 kuotajkn: parseInt(transactionResult.dataJadwal.kuota),
                 sisakuotanonjkn: transactionResult.kuotaSisaUpdate,
                 kuotanonjkn: parseInt(transactionResult.dataJadwal.kuota),
-                keterangan: 'Peserta harap 30 menit lebih awal || Jangan lupa ke Loket 4 untuk check in.'
+                keterangan: 'Silakan menuju loket 4 untuk melakukan registrasi biometrik.'
             },
             metadata: {
                 message: 'Ok',
