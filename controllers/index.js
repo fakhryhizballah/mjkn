@@ -437,7 +437,7 @@ const statusAntrean = async (req, res) => {
             kuotajkn: sisakuotajkn + Math.floor(jadwaldrp.kuota * 0.4), // contoh: kuotajkn bisa dihitung ulang
             sisakuotanonjkn: sisakuotanonjkn,
             kuotanonjkn: sisakuotanonjkn + Math.floor(jadwaldrp.kuota * 0.4),
-            keterangan: 'Datanglah Minimal 30 Menit Sebelum dan langsung ke LOKET 4 Untuk Cetak SEP'
+            keterangan: 'Datanglah Minimal 30 Menit Sebelum dan langsung ke loket pendaftaran Untuk Cetak SEP'
         };
 
       return  res.status(200).json({
@@ -738,7 +738,7 @@ const ambilAntrean = async (req, res) => {
                 kuotajkn: parseInt(transactionResult.dataJadwal.kuota),
                 sisakuotanonjkn: transactionResult.kuotaSisaUpdate,
                 kuotanonjkn: parseInt(transactionResult.dataJadwal.kuota),
-                keterangan: 'Silakan menuju loket 4 untuk melakukan registrasi biometrik.'
+                keterangan: 'Silakan menuju loket pendaftaran untuk melakukan registrasi biometrik.'
             },
             metadata: {
                 message: 'Ok',
